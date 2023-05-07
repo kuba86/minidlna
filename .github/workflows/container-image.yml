@@ -56,17 +56,17 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ github.event.repository.name }}
-          tags: latest ${{ github.sha }} ${{ github.ref_name }}
+          tags: latest ${{ github.sha }}
           oci: true
           containerfiles: |
             ./Containerfile
 
       - name: Podman check
         run: |
-          echo "------------------------------" \
-          && podman image ls && echo "------------------------------" \
-          && podman container ls --all --size && echo "------------------------------" \
-          && podman pod ls && echo "------------------------------" \
-          && podman network ls && echo "------------------------------" \
-          && podman system df && echo "------------------------------" \
+          echo "IMAGE ------------------------------" \
+          && podman image ls && echo "CONTAINER ------------------------------" \
+          && podman container ls --all --size && echo " POD ------------------------------" \
+          && podman pod ls && echo "NETWORK ------------------------------" \
+          && podman network ls && echo "SYSTEM ------------------------------" \
+          && podman system df && echo "VOLUME ------------------------------" \
           && podman volume ls && echo "------------------------------"
