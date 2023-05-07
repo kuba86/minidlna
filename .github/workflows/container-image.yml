@@ -50,7 +50,7 @@ jobs:
           containerfiles: |
             ./Containerfile
           extra-args: |
-            squash
+            --squash
 
       - name: Push To GitHub Container Registry
         id: push-to-ghcr
@@ -60,4 +60,4 @@ jobs:
           tags: ${{ steps.build-image.outputs.tags }}
           registry: ${{ env.IMAGE_REGISTRY }}
           extra-args: |
-            compression-format=zstd:chunked
+            --compression-format=zstd:chunked
