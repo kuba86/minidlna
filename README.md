@@ -1,2 +1,2 @@
-# minidlna-container
+# minidlna
 minidlna in a container
