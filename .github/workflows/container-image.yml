@@ -17,8 +17,9 @@ on:
 
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  REGISTRY_USER: ${{ github.actor }}
+  REGISTRY_PASSWORD: ${{ github.token }}
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
 
 jobs:
   build-and-push-image:
@@ -31,18 +32,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Log in to the Container registry
-        env:
-          REGISTRY: ${{ env.REGISTRY }}
-          USERNAME: ${{ github.actor }}
-          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        run: podman login --username $USERNAME --password $PASSWORD $REGISTRY
+      - name: Dump GitHub context
+        run: echo '${{ toJSON(github) }}'
+      - name: Dump job context
+        run: echo '${{ toJSON(job) }}'
+      - name: Dump steps context
+        run: echo '${{ toJSON(steps) }}'
+      - name: Dump runner context
+        run: echo '${{ toJSON(runner) }}'
+      - name: Dump strategy context
+        run: echo '${{ toJSON(strategy) }}'
+      - name: Dump matrix context
+        run: echo '${{ toJSON(matrix) }}'
+
+      - name: Log in to GitHub Container Registry
+        uses: redhat-actions/podman-login@v1
+        with:
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ env.REGISTRY_PASSWORD }}
+          registry: ${{ env.IMAGE_REGISTRY }}
 
       - name: Build container image
-        run: podman build --squash --tag minidlna:latest --file=Dockerfile .
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ github.event.repository.name }}
+          tags: latest ${{ github.sha }} ${{ github.ref_name }}
+          oci: true
+          containerfiles: |
+            ./Containerfile
 
-      - name: Publish container image
-        env:
-          REGISTRY: ${{ env.REGISTRY }}
-          USERNAME: ${{ github.actor }}
-        run: podman push minidlna:latest $REGISTRY/$USERNAME/minidlna:latest
+      - name: Podman check
+        run: |
+          echo "------------------------------" \
+          && podman image ls && echo "------------------------------" \
+          && podman container ls --all --size && echo "------------------------------" \
+          && podman pod ls && echo "------------------------------" \
+          && podman network ls && echo "------------------------------" \
+          && podman system df && echo "------------------------------" \
+          && podman volume ls && echo "------------------------------"
