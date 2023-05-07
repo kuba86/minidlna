@@ -46,13 +46,15 @@ jobs:
         run: echo '${{ toJSON(matrix) }}'
 
       - name: Log in to GitHub Container Registry
+        id: login-to-ghcr
         uses: redhat-actions/podman-login@v1
         with:
           username: ${{ env.REGISTRY_USER }}
           password: ${{ env.REGISTRY_PASSWORD }}
           registry: ${{ env.IMAGE_REGISTRY }}
 
-      - name: Build container image
+      - name: Build image
+        id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ github.event.repository.name }}
@@ -60,6 +62,17 @@ jobs:
           oci: true
           containerfiles: |
             ./Containerfile
+
+      - name: Push To GitHub Container Registry
+        id: push-to-ghcr
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.IMAGE_REGISTRY }}
+
+      - name: Print image url
+        run: echo "Image pushed to ${{ steps.push-to-ghcr.outputs.registry-paths }}"
 
       - name: Podman check
         run: |
