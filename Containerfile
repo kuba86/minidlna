@@ -2,7 +2,7 @@ FROM alpine:latest
 
 LABEL org.opencontainers.image.version=v1.3.2
 LABEL org.opencontainers.image.title="minidlna"
-LABEL org.opencontainers.image.description=minidlna server in a container
+LABEL org.opencontainers.image.description="minidlna server in a container"
 LABEL org.opencontainers.image.url="https://github.com/kuba86/minidlna"
 LABEL org.opencontainers.image.documentation="https://github.com/kuba86/minidlna/wiki"
 LABEL org.opencontainers.image.authors="kuba86"
