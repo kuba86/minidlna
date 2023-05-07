@@ -11,7 +11,10 @@ name: Create and publish a container image to Github packages
 
 on:
   push:
-    branches: ['main']
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 
 env:
   REGISTRY: ghcr.io
@@ -35,5 +38,11 @@ jobs:
           PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: podman login --username $USERNAME --password $PASSWORD $REGISTRY
 
-      - name: Build and push container image
+      - name: Build container image
         run: podman build --squash --tag minidlna:latest --file=Dockerfile .
+
+      - name: Publish container image
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          USERNAME: ${{ github.actor }}
+        run: podman push minidlna:latest $REGISTRY/$USERNAME/minidlna:latest
