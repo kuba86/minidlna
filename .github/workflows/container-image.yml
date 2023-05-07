@@ -11,7 +11,7 @@ name: Create and publish a container image to Github packages
 
 on:
   push:
-    branches: ['release']
+    branches: ['main']
 
 env:
   REGISTRY: ghcr.io
