@@ -32,19 +32,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Dump GitHub context
-        run: echo '${{ toJSON(github) }}'
-      - name: Dump job context
-        run: echo '${{ toJSON(job) }}'
-      - name: Dump steps context
-        run: echo '${{ toJSON(steps) }}'
-      - name: Dump runner context
-        run: echo '${{ toJSON(runner) }}'
-      - name: Dump strategy context
-        run: echo '${{ toJSON(strategy) }}'
-      - name: Dump matrix context
-        run: echo '${{ toJSON(matrix) }}'
-
       - name: Log in to GitHub Container Registry
         id: login-to-ghcr
         uses: redhat-actions/podman-login@v1
@@ -62,6 +49,8 @@ jobs:
           oci: true
           containerfiles: |
             ./Containerfile
+          extra-args: |
+            squash
 
       - name: Push To GitHub Container Registry
         id: push-to-ghcr
@@ -70,16 +59,5 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
           registry: ${{ env.IMAGE_REGISTRY }}
-
-      - name: Print image url
-        run: echo "Image pushed to ${{ steps.push-to-ghcr.outputs.registry-paths }}"
-
-      - name: Podman check
-        run: |
-          echo "IMAGE ------------------------------" \
-          && podman image ls && echo "CONTAINER ------------------------------" \
-          && podman container ls --all --size && echo " POD ------------------------------" \
-          && podman pod ls && echo "NETWORK ------------------------------" \
-          && podman network ls && echo "SYSTEM ------------------------------" \
-          && podman system df && echo "VOLUME ------------------------------" \
-          && podman volume ls && echo "------------------------------"
+          extra-args: |
+            compression-format=zstd:chunked
