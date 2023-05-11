@@ -32,41 +32,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Dump GitHub context
-        run: echo '${{ toJSON(github) }}'
-      - name: Dump job context
-        run: echo '${{ toJSON(job) }}'
-      - name: Dump steps context
-        run: echo '${{ toJSON(steps) }}'
-      - name: Dump runner context
-        run: echo '${{ toJSON(runner) }}'
-      - name: Dump strategy context
-        run: echo '${{ toJSON(strategy) }}'
-      - name: Dump matrix context
-        run: echo '${{ toJSON(matrix) }}'
-
       - name: Log in to GitHub Container Registry
+        id: login-to-ghcr
         uses: redhat-actions/podman-login@v1
         with:
           username: ${{ env.REGISTRY_USER }}
           password: ${{ env.REGISTRY_PASSWORD }}
           registry: ${{ env.IMAGE_REGISTRY }}
 
-      - name: Build container image
+      - name: Build image
+        id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ github.event.repository.name }}
-          tags: latest ${{ github.sha }} ${{ github.ref_name }}
+          tags: latest ${{ github.sha }}
           oci: true
           containerfiles: |
             ./Containerfile
+          extra-args: |
+            --squash
 
-      - name: Podman check
-        run: |
-          echo "------------------------------" \
-          && podman image ls && echo "------------------------------" \
-          && podman container ls --all --size && echo "------------------------------" \
-          && podman pod ls && echo "------------------------------" \
-          && podman network ls && echo "------------------------------" \
-          && podman system df && echo "------------------------------" \
-          && podman volume ls && echo "------------------------------"
+      - name: Push To GitHub Container Registry
+        id: push-to-ghcr
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.IMAGE_REGISTRY }}
