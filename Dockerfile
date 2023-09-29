@@ -1,4 +1,4 @@
-FROM alpine:3.18.3
+FROM alpine:3.18.4
 
 
 LABEL org.opencontainers.image.version=v1.3.2
