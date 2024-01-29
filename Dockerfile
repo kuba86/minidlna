@@ -1,4 +1,4 @@
-FROM alpine:3.19.0
+FROM alpine:3.19.1
 
 LABEL org.opencontainers.image.version=v1.3.3
 LABEL org.opencontainers.image.title="minidlna"
