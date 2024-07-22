@@ -1,4 +1,4 @@
-FROM alpine:3.20.1
+FROM alpine:3.20.2
 
 LABEL org.opencontainers.image.version=v1.3.3
 LABEL org.opencontainers.image.title="minidlna"
@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.documentation="https://github.com/kuba86/minidlna
 LABEL org.opencontainers.image.authors="kuba86"
 LABEL org.opencontainers.image.licenses=Apache-2.0
 LABEL org.opencontainers.image.source="https://github.com/kuba86/minidlna"
-LABEL org.opencontainers.image.base.name="docker.io/library/alpine:3.19.0"
+LABEL org.opencontainers.image.base.name="docker.io/library/alpine:3.20.2"
 
 ADD entrypoint.sh /minidlna/
 RUN apk \
