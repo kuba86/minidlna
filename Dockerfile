@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.documentation="https://github.com/kuba86/minidlna
 LABEL org.opencontainers.image.authors="kuba86"
 LABEL org.opencontainers.image.licenses=Apache-2.0
 LABEL org.opencontainers.image.source="https://github.com/kuba86/minidlna"
-LABEL org.opencontainers.image.base.name="docker.io/library/alpine:3.20.1"
+LABEL org.opencontainers.image.base.name="docker.io/library/alpine:3.21.3"
 
 ADD entrypoint.sh /minidlna/
 RUN apk \
